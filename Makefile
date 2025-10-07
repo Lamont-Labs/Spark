@@ -1,20 +1,7 @@
-# FILE: Makefile
-PROJECT=SparkApp_v2.3
-
-init_all:
-	@echo "Initializing local environment for $(PROJECT)"
-	python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt
-
-run_demo:
-	@echo "Launching Spark demo (offline)"
-	cd src/core && python streak_engine.py
-
-verify:
-	bash verify.sh
+.PHONY: sbom
 
 sbom:
 	@echo "Generating SBOM (placeholder)"
-	@echo '{"tool":"syft","result":"sbom.cdx.json"}' > SBOM/sbom.cdx.json
-
-zip:
-	@zip -r dist/$(PROJECT)_bundle.zip . -x "*.venv*" "__pycache__"
+	@mkdir -p SBOM
+	@echo '{ "sbom": "CycloneDX placeholder for SparkApp v2.3", "generated_at": "$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")" }' > SBOM/sbom.cdx.json
+	@echo "[✓] SBOM written to SBOM/sbom.cdx.json"
