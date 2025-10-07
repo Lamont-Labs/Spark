@@ -1,0 +1,63 @@
+# FILE: .github/workflows/ci.yml
+name: sparkapp-demo-ci
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install Python deps
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Seed demo data (SQLite)
+        run: |
+          python3 cli/seed_entries.py
+        env:
+          SPARK_DB_PATH: dist/demo_db/spark_demo.sqlite
+
+      - name: Run Python tests (if present)
+        run: |
+          if [ -d tests ]; then pytest -q; else echo "No tests directory; skipping."; fi
+
+      - name: Verify determinism & provenance
+        run: bash verify.sh
+
+      - name: Generate SBOM placeholder
+        run: make sbom
+
+      - name: Upload provenance & SBOM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sparkapp-v2.3-provenance
+          path: |
+            SBOM/**
+            dist/demo_db/**
+            SBOM/checksums.csv
+            SBOM/provenance.json
+          if-no-files-found: warn
