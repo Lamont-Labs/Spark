@@ -1,21 +1,14 @@
-"""
-SparkApp v2.3 — Demo Seeder
-Purpose: Creates or refreshes a local SQLite demo DB with synthetic entries.
-This is a deterministic, self-contained seed script for CI.
-"""
+# FILE: cli/seed_entries.py
+import sqlite3, os, datetime
 
-import os
-import sqlite3
-from datetime import datetime
+def seed_demo():
+    os.makedirs("dist/demo_db", exist_ok=True)
+    db_path = "dist/demo_db/spark_demo.sqlite"
+    conn = sqlite3.connect(db_path)
+    c = conn.cursor()
 
-DB_PATH = os.environ.get("SPARK_DB_PATH", "dist/demo_db/spark_demo.sqlite")
-os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-
-def seed_demo_data():
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS entries (
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS gratitude_entries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             date TEXT,
             gratitude TEXT,
@@ -23,15 +16,17 @@ def seed_demo_data():
             affirmation TEXT
         )
     """)
-    demo_rows = [
-        ("2025-10-01", "A good morning walk", "Finished first demo run", "I am consistent."),
-        ("2025-10-02", "Time with family", "Fixed workflow", "I follow through."),
-        ("2025-10-03", "Learning progress", "Improved CI", "I keep improving.")
+
+    demo_entries = [
+        ("2025-10-05", "Woke up early and focused", "Finished repo CI", "I persist until proof."),
+        ("2025-10-06", "Good conversation with family", "Kept streak alive", "I adapt calmly."),
+        ("2025-10-07", "Healthy meal and walk", "Clean CI pass", "I’m proud of progress.")
     ]
-    cur.executemany("INSERT INTO entries (date, gratitude, win, affirmation) VALUES (?, ?, ?, ?)", demo_rows)
+
+    c.executemany("INSERT INTO gratitude_entries (date, gratitude, win, affirmation) VALUES (?, ?, ?, ?)", demo_entries)
     conn.commit()
     conn.close()
-    print(f"[✓] Demo DB seeded with {len(demo_rows)} entries at {DB_PATH}")
+    print(f"[✓] Demo database seeded at {db_path}")
 
 if __name__ == "__main__":
-    seed_demo_data()
+    seed_demo()
