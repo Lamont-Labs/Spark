@@ -1,0 +1,6 @@
+/src/app/         React Native screens  
+/src/core/        Streak engine + prompts  
+/cli/             Demo CLI commands  
+/docs/            Documentation bundle  
+/dist/            Demo database + outputs  
+/SBOM/            Provenance + SBOM
