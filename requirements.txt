@@ -1,0 +1,6 @@
+# FILE: requirements.txt
+fastapi==0.115.0
+pydantic==2.6.4
+typer==0.9.0
+sqlite-utils==3.35
+cryptography==42.0.4
