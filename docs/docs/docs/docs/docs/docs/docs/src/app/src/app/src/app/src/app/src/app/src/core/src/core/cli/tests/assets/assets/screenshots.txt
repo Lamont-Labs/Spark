@@ -1,0 +1,5 @@
+# FILE: assets/screenshots.txt
+- today_screen_demo.png  
+- history_list_demo.png  
+- streaks_status_demo.png  
+- settings_export_demo.png
