@@ -1,0 +1,18 @@
+# FILE: SBOM/sbom.cdx.json
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-10-05T00:00:00Z",
+    "tools": [
+      { "vendor": "Lamont Labs", "name": "Spark SBOM Generator", "version": "v2.3" }
+    ],
+    "component": { "name": "SparkApp", "type": "application", "version": "v2.3" }
+  },
+  "components": [
+    { "type": "library", "name": "expo", "version": "51.x" },
+    { "type": "library", "name": "react-native", "version": "0.75.x" },
+    { "type": "library", "name": "python", "version": "3.11" }
+  ]
+}
