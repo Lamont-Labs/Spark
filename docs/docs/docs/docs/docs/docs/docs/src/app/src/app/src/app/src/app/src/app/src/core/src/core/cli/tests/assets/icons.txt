@@ -1,0 +1,6 @@
+# FILE: assets/icons.txt
+📘 spark_logo.png  
+🌟 streak_badge.png  
+❤️ gratitude_icon.png  
+🏆 win_icon.png  
+✨ affirmation_icon.png
