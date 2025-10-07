@@ -13,13 +13,25 @@ permissions:
 jobs:
   build-test-verify:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: SparkApp_v2.3   # 👈 fix: set correct working dir
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Detect project root
+        shell: bash
+        run: |
+          if [ -d "SparkApp_v2.3" ]; then
+            echo "PROJECT_DIR=SparkApp_v2.3" >> "$GITHUB_ENV"
+          else
+            echo "PROJECT_DIR=." >> "$GITHUB_ENV"
+          fi
+          echo "Using PROJECT_DIR=$PROJECT_DIR"
+
+      - name: Show tree
+        shell: bash
+        run: |
+          ls -la
+          if [ -d "SparkApp_v2.3" ]; then ls -la SparkApp_v2.3; fi
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -27,21 +39,32 @@ jobs:
           python-version: "3.11"
 
       - name: Install Python deps
+        working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          pip install -r requirements.txt
+          pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Seed demo data (SQLite)
+        working-directory: ${{ env.PROJECT_DIR }}
+        env:
+          PYTHONPATH: ${{ env.PROJECT_DIR }}
+          SPARK_DB_PATH: dist/demo_db/spark_demo.sqlite
         run: |
           python3 cli/seed_entries.py
 
       - name: Run Python tests (if present)
+        working-directory: ${{ env.PROJECT_DIR }}
+        env:
+          PYTHONPATH: ${{ env.PROJECT_DIR }}
         run: |
           if [ -d tests ]; then pytest -q; else echo "No tests directory; skipping."; fi
 
       - name: Verify determinism & provenance
+        working-directory: ${{ env.PROJECT_DIR }}
         run: bash verify.sh
 
       - name: Generate SBOM placeholder
+        working-directory: ${{ env.PROJECT_DIR }}
         run: make sbom
 
       - name: Upload provenance & SBOM artifacts
@@ -49,8 +72,8 @@ jobs:
         with:
           name: sparkapp-v2.3-provenance
           path: |
-            SBOM/**
-            dist/demo_db/**
-            SBOM/checksums.csv
-            SBOM/provenance.json
+            ${{ env.PROJECT_DIR }}/SBOM/**
+            ${{ env.PROJECT_DIR }}/dist/demo_db/**
+            ${{ env.PROJECT_DIR }}/SBOM/checksums.csv
+            ${{ env.PROJECT_DIR }}/SBOM/provenance.json
           if-no-files-found: warn
