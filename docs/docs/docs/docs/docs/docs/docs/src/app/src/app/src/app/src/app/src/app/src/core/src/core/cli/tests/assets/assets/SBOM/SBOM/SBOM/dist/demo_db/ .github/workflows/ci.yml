@@ -1,0 +1,32 @@
+# FILE: .github/workflows/ci.yml
+name: sparkapp-demo-ci
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: |
+          pip install -r requirements.txt
+          npm install -g expo-cli
+      - name: Run seed + verify
+        run: |
+          python3 cli/seed_entries.py
+          bash verify.sh
+      - name: Generate SBOM
+        run: make sbom
