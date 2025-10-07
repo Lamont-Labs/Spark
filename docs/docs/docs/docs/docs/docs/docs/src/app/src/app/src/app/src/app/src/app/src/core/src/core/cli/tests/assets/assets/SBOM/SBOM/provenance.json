@@ -1,0 +1,16 @@
+# FILE: SBOM/provenance.json
+{
+  "project": "SparkApp",
+  "version": "v2.3",
+  "owner": "Jesse J. Lamont",
+  "timestamp": "2025-10-05T00:00:00Z",
+  "commit": "seed-demo",
+  "sha256_root": "sha256:demo-seed-placeholder",
+  "artifacts": [
+    "src/core/streak_engine.py",
+    "src/app/App.js",
+    "dist/demo_db/spark_demo.sqlite"
+  ],
+  "verified": true,
+  "note": "Deterministic demo seed validated with verify.sh."
+}
