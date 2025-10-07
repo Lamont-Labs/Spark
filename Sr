@@ -1,0 +1,49 @@
+"""
+SparkApp v2.3 — Deterministic Streak Engine
+This module provides the "bend-not-break" streak logic used in the demo.
+It ensures daily streaks persist through limited missed days.
+"""
+
+import datetime
+import json
+import os
+
+DB_PATH = os.environ.get("SPARK_DB_PATH", "dist/demo_db/spark_demo.sqlite")
+
+def compute_streak(entries):
+    """Compute streak length allowing one grace day per 7 days."""
+    if not entries:
+        return 0
+    # Convert string dates to date objects and sort
+    days = sorted(datetime.date.fromisoformat(d) for d in entries)
+    streak, grace, max_streak = 1, 1, 1
+    for i in range(1, len(days)):
+        delta = (days[i] - days[i - 1]).days
+        if delta == 1:
+            streak += 1
+        elif delta == 2 and grace > 0:
+            streak += 1
+            grace -= 1
+        else:
+            max_streak = max(max_streak, streak)
+            streak, grace = 1, 1
+    return max(max_streak, streak)
+
+def demo_streak_export():
+    """Runs demo streak logic on seeded entries and writes output JSON."""
+    entries = ["2025-10-01", "2025-10-02", "2025-10-03", "2025-10-05"]
+    streak_length = compute_streak(entries)
+    result = {
+        "demo_run": str(datetime.datetime.utcnow()),
+        "entries_count": len(entries),
+        "streak_length": streak_length,
+    }
+    os.makedirs("provenance", exist_ok=True)
+    out_file = "provenance/streak_result.json"
+    with open(out_file, "w") as f:
+        json.dump(result, f, indent=2)
+    print(f"[✓] Streak engine output → {out_file}")
+    return out_file
+
+if __name__ == "__main__":
+    demo_streak_export()
