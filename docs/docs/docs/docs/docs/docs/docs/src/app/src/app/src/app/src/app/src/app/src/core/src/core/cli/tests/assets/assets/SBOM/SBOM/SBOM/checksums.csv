@@ -1,0 +1,6 @@
+# FILE: SBOM/checksums.csv
+file,sha256
+src/core/streak_engine.py,sha256:d3mo123456789abcdef
+src/app/App.js,sha256:abcd9876543210demo
+cli/seed_entries.py,sha256:feedbeef123456789
+verify.sh,sha256:checkme987654321
